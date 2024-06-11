@@ -34,23 +34,53 @@ async def get_todos(db: Session = Depends(get_db)):
     todos = crud.get_todos(db)
     return todos
 
+@app.put("/todo")
+async def update_todo(updated_todo: schema.TodoUpdate, db: Session = Depends(get_db)):
+    db_todo = crud.get_todo(db, updated_todo.id)
+    if db_todo is None:
+        raise HTTPException(status_code=404, detail="Fail to find todo")
+    crud.update_todo(db, db_todo, updated_todo)
+
+@app.post("/todo")
+async def create_todo(todo: schema.TodoCreate, db: Session = Depends(get_db)):
+    if not crud.create_todo(db, todo):
+        raise HTTPException(status_code=404, detail="Invalid Start End Time")
+
+@app.get("/DailyComment")
+async def get_all_daily_comment(db: Session = Depends(get_db)):
+    daily_comment = crud.get_all_daily_comment(db)
+    return daily_comment
+
+@app.post("/DailyComment")
+async def create_daily_comment(daily_comment: schema.DailyCommentCreate, db: Session = Depends(get_db)):
+    crud.create_daily_comment(db, daily_comment)
+
+@app.get("/DailyComment/{date}")
+async def get_daily_comment(date: int, db: Session = Depends(get_db)):
+    daily_comment = crud.get_daily_comment(db, date)
+    if daily_comment is None:
+        raise HTTPException(status_code=404, detail="Fail to find daily comment")
+    return daily_comment
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.get("/todo/{todo_id}")
 async def get_todo(todo_id: int, db: Session = Depends(get_db)):
     todo = crud.get_todo(db, todo_id)
     if todo is None:
         raise HTTPException(status_code=404, detail="todo not found")
     return todo
-
-@app.post("/todo")
-async def create_todo(todo: schema.TodoCreate, db: Session = Depends(get_db)):
-    crud.create_todo(db, todo)
-
-@app.put("/todo")
-async def update_todo(updated_todo: schema.TodoUpdate, db: Session = Depends(get_db)):
-    db_todo = crud.get_todo(db, updated_todo.id)
-    if db_todo is None:
-        raise HTTPException(status_code=404, detail="todo not found")
-    crud.update_todo(db, db_todo, updated_todo)
 
 @app.delete("/todo/{todo_id}")
 async def delete_todo(todo_id: int, db: Session = Depends(get_db)):

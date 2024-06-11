@@ -7,6 +7,8 @@ class TodoBase(BaseModel):
 
 class TodoCreate(BaseModel):
     content: str
+    start_time: int
+    end_time: int
     done : bool
 
 class TodoUpdate(BaseModel):
@@ -19,3 +21,8 @@ class Todo(TodoBase):
 
     class Config:
         orm_mode = True
+
+
+class DailyCommentCreate(BaseModel):
+    date:    int
+    comment: str
